@@ -252,7 +252,8 @@ function postpartner_forumbit(&$forum)
 {
   global $db, $mybb, $gesuche, $templates;
   $forum['postpartner'] = "";
-  if ($forum['fid'] == "7") {
+  $forumfid = $mybb->settings['postpartner_forum'];
+  if ($forum['fid'] == "{$forumfid}") {
     $erg = $db->query("SELECT * FROM " . TABLE_PREFIX . "postpartner WHERE search = '1' ORDER BY rand() LIMIT 1");
     if ($db->num_rows($erg)) {
       while ($data = $db->fetch_array($erg)) {
@@ -277,8 +278,7 @@ function postpartner_forumbit(&$forum)
           );
           $sceneideascontent = $parser->parse_message($data['ideas'], $options);
 
-          $sceneideas = " <a onclick=\"$('#scene_header').modal({ fadeDuration: 250, keepelement: true, zIndex: (typeof modal_zindex !== 'undefined' ? modal_zindex : 9999) }); return false;\" style=\"cursor: pointer;\">[Ideas]</a>";
-          $sceneideas_modal = " <div class=\"modal\" id=\"scene_header\" style=\"display: none; padding: 10px; margin: auto; text-align: center;\">{$sceneideascontent}</div>
+          $sceneideas = "
       ";
         } else {
           $sceneideas = "";
@@ -449,6 +449,13 @@ function postpartner_settings()
       'value' => '0', // Default
       'disporder' => 2
     ),
+    'postpartner_forum' => array(
+      'title' => "Soll ein zufälliger Suchender über einem Forum auf dem Index angezeigt werden? Dann gebe hier die Forum ID ein.",
+      'description' => "",
+      'optionscode' => 'numeric',
+      'value' => '0', // Default
+      'disporder' => 2
+    ),
     'postpartner_discord_webhook' => array(
       'title' => "Soll automatisch eine Nachricht in Discord erstellt werden?",
       'description' => "",
@@ -616,14 +623,29 @@ function postpartner_templates()
 
   $template[] = array(
     "title" => 'postpartner_header',
-    "template" => '
+    "template" => $db->escape_string('
     <div class="postpartner-search">
 		<div class="postpartner-search--img">{$partner_ava}</div>
 		<div class="postpartner-search--user"><a href="member.php?action=profile&uid={$partner_uid}">{$partner_username}</a> sucht einen Postpartner {$sceneideas}</div>
 		<div class="postpartner-search--user"><i class="fa-solid fa-paper-plane"></i> <a href="private.php?action=send&uid={$partner_uid}">send PM</a></div>
-	</div>
+	</div>'),
+    "sid" => "-2",
+    "version" => "1.0",
+    "dateline" => TIME_NOW
+  );
+
+    $template[] = array(
+    "title" => 'postpartner_forumbit',
+    "template" => $db->escape_string('
+      <div class="postpartner-forumbit">
+        <div class="postpartner-forumbit__title">play together</div>
+        <div class="postpartner-forumbit__postpartnerimg">{$partner_ava}</div>
+        <div class="postpartner-forumbit__postpartneruser"><a href="member.php?action=profile&uid={$partner_uid}"><b>{$partner_username}</b></a> sucht einen Postpartner <a onclick="$(\'#scene_forumbit\').modal({ fadeDuration: 250, keepelement: true, zIndex: (typeof modal_zindex !== \'undefined\' ? modal_zindex : 9999) }); return false;" style="cursor: pointer;">[Ideas]</a> <div class="modal" id="scene_forumbit" style="display: none; padding: 10px; margin: auto; text-align: center;">{$sceneideascontent}</div>
+        </div>
+        <div class="postpartner-forumbit__postpartnerpm"><i class="fa-solid fa-paper-plane"></i> <a href="private.php?action=send&uid={$partner_uid}">send PM</a></div>
+      </div>
     
-    ',
+    '),
     "sid" => "-2",
     "version" => "1.0",
     "dateline" => TIME_NOW
