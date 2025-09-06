@@ -1,3 +1,5 @@
+# Hinweis: noch nicht ausgiebig getestet
+
 # Postpartner Suche (MyBB Plugin)
 Mit diesem Plugin können Mitglieder in ihrem Benutzerkontrollzentrum (UCP) angeben, ob sie aktuell nach einem Postpartner suchen.  
 Die Suchenden werden an verschiedenen Stellen im Forum hervorgehoben und auf einer Übersichtsseite gesammelt dargestellt.  
